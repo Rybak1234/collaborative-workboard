@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { boardStore } from "@/lib/store";
+import dbConnect from "@/lib/mongodb";
+import Board from "@/models/Board";
 
 export async function GET() {
-  return NextResponse.json(boardStore.findAll());
+  await dbConnect();
+  const boards = await Board.find().sort({ updatedAt: -1 }).lean();
+  return NextResponse.json(boards);
 }
 
 export async function POST(req: NextRequest) {
+  await dbConnect();
   const body = await req.json();
-  const board = boardStore.create({
+  const board = await Board.create({
     name: body.name,
     description: body.description || "",
     columns: body.columns || ["Por hacer", "En progreso", "En revisión", "Completado"],
