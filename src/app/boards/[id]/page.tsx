@@ -45,9 +45,11 @@ export default function BoardPage() {
     loadBoard();
   }, [loadBoard]);
 
-  // Real-time with Pusher
+  // Real-time with Pusher (optional — only if keys are configured)
   useEffect(() => {
     const pusher = getPusherClient();
+    if (!pusher) return; // Pusher not configured, skip real-time
+
     const channel = pusher.subscribe(`board-${params.id}`);
 
     channel.bind("task-created", (task: Task) => {
